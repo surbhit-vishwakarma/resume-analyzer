@@ -53,7 +53,11 @@ public class PDFAnalyzer {
             var serviceResponse = iAnalysisService.getAnalysisForResumeService(pdfString,pdfUploadRequest);
             document.close();
 
-            return null;
+            return serviceResponse.thenApply(serviceResult ->{
+               ResponseEntity<ResponseJson> response= ResponseEntity.ok(serviceResult);
+
+              return response;
+            });
         } catch (IOException e) {
             LOGGER.info("Exception occurred : ", e.getCause());
             return null;

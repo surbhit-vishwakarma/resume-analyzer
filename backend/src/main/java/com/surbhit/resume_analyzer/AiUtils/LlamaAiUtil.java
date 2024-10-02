@@ -27,7 +27,7 @@ public class LlamaAiUtil {
     public CompletableFuture<String> generateMessage(String prompt){
         ChatResponse response = ollamaChatModel.call(
                 new Prompt(prompt,
-                        OllamaOptions.create().withModel("llamaVersion"))
+                        OllamaOptions.create().withModel(llamaVersion ))
         );
 
         return CompletableFuture.completedFuture(response.getResult().getOutput().getContent());
