@@ -1,25 +1,35 @@
 package com.surbhit.resume_analyzer.AiUtils;
-
 import org.springframework.ai.chat.model.ChatResponse;
 import org.springframework.ai.chat.prompt.Prompt;
 import org.springframework.ai.ollama.OllamaChatModel;
 import org.springframework.ai.ollama.api.OllamaOptions;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
+import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Component;
-import org.springframework.stereotype.Service;
+import java.util.concurrent.CompletableFuture;
+
+/*
+@Author - Surbhit Vishwakarma
+ */
 
 @Component
-public class LlamaAiService {
+public class LlamaAiUtil {
 
     @Autowired
     private OllamaChatModel ollamaChatModel;
 
-    public String generateMessage(String prompt){
+    @Value("${llama.version}")
+    private String llamaVersion;
+
+
+    @Async
+    public CompletableFuture<String> generateMessage(String prompt){
         ChatResponse response = ollamaChatModel.call(
                 new Prompt(prompt,
-                        OllamaOptions.create().withModel("llama2"))
+                        OllamaOptions.create().withModel(llamaVersion ))
         );
 
-        return response.getResult().getOutput().getContent();
+        return CompletableFuture.completedFuture(response.getResult().getOutput().getContent());
     }
 }

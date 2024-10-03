@@ -67,6 +67,13 @@
 			<version>2.17.2</version>
 		</dependency>
 
+		<!--Pdf Reader-->
+		<dependency>
+			<groupId>org.apache.pdfbox</groupId>
+			<artifactId>pdfbox</artifactId>
+			<version>2.0.27</version> <!-- Make sure to check for the latest version -->
+		</dependency>
+
 	</dependencies>
 	<dependencyManagement>
 		<dependencies>
