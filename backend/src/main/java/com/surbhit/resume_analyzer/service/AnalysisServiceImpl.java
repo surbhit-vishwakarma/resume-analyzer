@@ -1,8 +1,7 @@
 package com.surbhit.resume_analyzer.service;
 
-
 import com.surbhit.resume_analyzer.AiUtils.LlamaAiUtil;
-import com.surbhit.resume_analyzer.controller.PDFAnalyzer;
+import com.surbhit.resume_analyzer.constant.PromptConstants;
 import com.surbhit.resume_analyzer.model.PDFUploadRequest;
 import com.surbhit.resume_analyzer.model.ResponseJson;
 import org.slf4j.Logger;
@@ -26,14 +25,18 @@ public class AnalysisServiceImpl implements IAnalysisService {
             String yearOfExperience = pdfUploadRequest.getYoe();
             String field = pdfUploadRequest.getField();
 
-            CompletableFuture<String> analysedResponse = llamaAiUtil.generateMessage("Hello");
+            String prompt = PromptConstants.ANALYSIS + PromptConstants.HAVING + PromptConstants.YOE + yearOfExperience +
+                    PromptConstants.AND + PromptConstants.FIELD + field + PromptConstants.RESUME_DETAILS + pdfString;
 
-            return analysedResponse.thenApply(resultResponseFromLlama ->{
+            LOGGER.info(prompt);
+            CompletableFuture<String> analysedResponse = llamaAiUtil.generateMessage(prompt);
+
+            return analysedResponse.thenApply(resultResponseFromLlama -> {
                 ResponseJson responseJson = new ResponseJson();
-                responseJson.setBody(resultResponseFromLlama);
+                responseJson.setBody(resultResponseFromLlama.replace("\n", ""));
                 return responseJson;
             });
-        }catch (Exception e){
+        } catch (Exception e) {
             throw new RuntimeException(e);
         }
     }
