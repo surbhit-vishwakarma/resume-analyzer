@@ -1,6 +1,7 @@
 package com.surbhit.resume_analyzer.service;
 
-import com.surbhit.resume_analyzer.AiUtils.LlamaAiUtil;
+import com.surbhit.resume_analyzer.Utils.CacheUtils;
+import com.surbhit.resume_analyzer.Utils.LlamaAiUtil;
 import com.surbhit.resume_analyzer.constant.PromptConstants;
 import com.surbhit.resume_analyzer.model.PDFUploadRequest;
 import com.surbhit.resume_analyzer.model.ResponseJson;
@@ -17,6 +18,9 @@ public class AnalysisServiceImpl implements IAnalysisService {
     @Autowired
     LlamaAiUtil llamaAiUtil;
 
+    @Autowired
+    CacheUtils cacheUtils;
+
     private static final Logger LOGGER = LoggerFactory.getLogger(AnalysisServiceImpl.class);
 
     @Override
@@ -30,6 +34,8 @@ public class AnalysisServiceImpl implements IAnalysisService {
 
             LOGGER.info(prompt);
             CompletableFuture<String> analysedResponse = llamaAiUtil.generateMessage(prompt);
+
+            cacheUtils.getCacheData(pdfUploadRequest);
 
             return analysedResponse.thenApply(resultResponseFromLlama -> {
                 ResponseJson responseJson = new ResponseJson();

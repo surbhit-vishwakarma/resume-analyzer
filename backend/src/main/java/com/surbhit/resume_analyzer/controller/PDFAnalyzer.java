@@ -1,6 +1,7 @@
 package com.surbhit.resume_analyzer.controller;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.surbhit.resume_analyzer.Utils.CacheUtils;
 import com.surbhit.resume_analyzer.model.PDFUploadRequest;
 import com.surbhit.resume_analyzer.model.ResponseJson;
 import com.surbhit.resume_analyzer.service.IAnalysisService;
@@ -10,13 +11,13 @@ import org.apache.pdfbox.text.PDFTextStripper;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.io.IOException;
 import java.util.concurrent.CompletableFuture;
+import java.util.concurrent.ExecutionException;
 
 /*
 @Author - Surbhit Vishwakarma
@@ -35,6 +36,9 @@ public class PDFAnalyzer {
 
     @Autowired
     private IAnalysisService iAnalysisService;
+
+    @Autowired
+    CacheUtils cacheUtils;
 
     @PostMapping("/upload")
     public CompletableFuture<ResponseEntity<ResponseJson>> getAnalysis(
@@ -57,7 +61,7 @@ public class PDFAnalyzer {
 //            Service
             var serviceResponse = iAnalysisService.getAnalysisForResumeService(pdfString, pdfUploadRequest);
 
-            LOGGER.info("Current value of organisation {}", httpSession.getAttribute("organisation"));
+            LOGGER.info("Current value of session {}", httpSession.getAttribute("pdfUploadRequest"));
             return serviceResponse.thenApply(serviceResult -> {
                 ResponseEntity<ResponseJson> response = ResponseEntity.ok(serviceResult);
 
@@ -67,5 +71,12 @@ public class PDFAnalyzer {
             LOGGER.info("Exception occurred : ", e.getCause());
             return null;
         }
+    }
+
+    @GetMapping("/get")
+    public String getInterviewQuestions(HttpSession httpSession) throws ExecutionException, InterruptedException {
+        LOGGER.info("Inside getInterviewQuestions api");
+        var res = cacheUtils.getCacheData((PDFUploadRequest) httpSession.getAttribute("pdfUploadRequest"));
+        return res.get();
     }
 }

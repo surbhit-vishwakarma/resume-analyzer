@@ -12,4 +12,6 @@ public class PromptConstants {
     public static final String FIELD = " for field : ";
     public static final String RESUME_DETAILS = ". Resume details as follow - ";
     public static final String AND = " and";
+    public static final String INTERVIEW_QUESTION = "Please give 20 interview question asked in : ";
+    public static final String FOR = " for ";
 }
