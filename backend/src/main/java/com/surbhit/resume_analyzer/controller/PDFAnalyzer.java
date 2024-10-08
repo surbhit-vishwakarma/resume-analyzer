@@ -4,14 +4,17 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.surbhit.resume_analyzer.model.PDFUploadRequest;
 import com.surbhit.resume_analyzer.model.ResponseJson;
 import com.surbhit.resume_analyzer.service.IAnalysisService;
+import jakarta.servlet.http.HttpSession;
 import org.apache.pdfbox.pdmodel.PDDocument;
 import org.apache.pdfbox.text.PDFTextStripper;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
+
 import java.io.IOException;
 import java.util.concurrent.CompletableFuture;
 
@@ -37,26 +40,28 @@ public class PDFAnalyzer {
     public CompletableFuture<ResponseEntity<ResponseJson>> getAnalysis(
             @RequestParam("file") MultipartFile file,       // PDF file sent as a request param
             @RequestParam("metadata") String metadata                  // JSON metadata sent as a request body
-    ) {
+            , HttpSession httpSession) {
         LOGGER.info("Inside getAnalysis api ::");
         try {
-            ResponseJson responseJson = new ResponseJson();
             PDDocument document = PDDocument.load(file.getInputStream());
             // Extract text using PDFTextStripper
             PDFTextStripper pdfStripper = new PDFTextStripper();
             String pdfString = pdfStripper.getText(document);
+            document.close();
+
 
 //            Extract Metadata
             PDFUploadRequest pdfUploadRequest = objectMapper.readValue(metadata, PDFUploadRequest.class);
-
+//            Storing org in session
+            httpSession.setAttribute("organisation", pdfUploadRequest.getOrg());
 //            Service
-            var serviceResponse = iAnalysisService.getAnalysisForResumeService(pdfString,pdfUploadRequest);
-            document.close();
+            var serviceResponse = iAnalysisService.getAnalysisForResumeService(pdfString, pdfUploadRequest);
 
-            return serviceResponse.thenApply(serviceResult ->{
-               ResponseEntity<ResponseJson> response= ResponseEntity.ok(serviceResult);
+            LOGGER.info("Current value of organisation {}", httpSession.getAttribute("organisation"));
+            return serviceResponse.thenApply(serviceResult -> {
+                ResponseEntity<ResponseJson> response = ResponseEntity.ok(serviceResult);
 
-              return response;
+                return response;
             });
         } catch (IOException e) {
             LOGGER.info("Exception occurred : ", e.getCause());
