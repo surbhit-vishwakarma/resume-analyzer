@@ -1,7 +1,8 @@
 import { useRef, useState } from "react";
-import axios from 'axios';
+import axios from "axios";
+import Form from "./Form";
 function PDFUploaderSection(props) {
-  const {setLoading} = props;
+  const { setLoading } = props;
   const fileInputRef = useRef(null); // Use ref to access the file input element
   const pdfFileRef = useRef(null); // Use ref to store the selected PDF file
 
@@ -11,6 +12,12 @@ function PDFUploaderSection(props) {
 
   const [error, setError] = useState(null);
   const [data, setData] = useState([]);
+  const [field, setField] = useState("");
+  const [targetedOrganisation, setTargetedOrganisation] = useState("");
+  const [yoe, setYoe] = useState("");
+  const [ryoe, setRyoe] = useState("");
+
+  function onSubmit() {}
 
   const fetchData = async () => {
     setLoading(true); // Set loading to true before the API call
@@ -33,8 +40,7 @@ function PDFUploaderSection(props) {
       // Check if it's a PDF
       pdfFileRef.current = file; // Store the file in useRef
       console.log("Selected PDF:", pdfFileRef.current); // You can log or do something with the file
-      fetchData();
-      event.target.value = ""; 
+      event.target.value = "";
     } else {
       alert("Please select a PDF file");
     }
@@ -59,6 +65,13 @@ function PDFUploaderSection(props) {
             </button>
             <p className="mt-1">*Click here and select your resume</p>
           </div>
+          <Form
+            field={setField}
+            targetedOrganisation={setTargetedOrganisation}
+            yoe={setYoe}
+            ryoe={setRyoe}
+            onSubmit={onSubmit}
+          />
           <p className="mb-4 text-center">
             Note: Resume format must be of PDF type.
           </p>
