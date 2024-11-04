@@ -17,20 +17,45 @@ function PDFUploaderSection(props) {
   const [yoe, setYoe] = useState("");
   const [ryoe, setRyoe] = useState("");
 
-  function onSubmit() {}
+  function onSubmit() {
+    fetchData();
+  }
 
   const fetchData = async () => {
-    setLoading(true); // Set loading to true before the API call
-    setError(null); // Reset error state
+    setLoading(true);
+    setError(null);
+    const formData = new FormData();
+
+    // Metadata object
+    const metadata = {
+      field: field,
+      org: targetedOrganisation,
+      yoe: yoe,
+      rYoe: ryoe,
+    };
+
+    // Attach the PDF file
+
+    formData.append("file", pdfFileRef.current); // Append PDF file
+
+    // Attach metadata as plain text
+    formData.append("metadata", JSON.stringify(metadata));
+    console.log(pdfFileRef.current);
     try {
-      const response = await axios.get("https://httpbin.org/delay/10");
-      console.log(response.data); // Log the fetched data
-      setData(response.data); // Update the state with the fetched data
-    } catch (err) {
-      setError(err.message); // Set the error message if the API call fails
-      console.error("Error fetching data:", err); // Log the error
+      const response = await axios.post(
+        "http://localhost:8080/api/analyze/upload",
+        formData,
+        {
+          headers: {
+            "Content-Type": "multipart/form-data",
+          },
+        }
+      );
+      console.log("Response:", response.data);
+    } catch (error) {
+      console.error("Error uploading data:", error);
     } finally {
-      setLoading(false); // Set loading to false after the call completes
+      setLoading(false);
     }
   };
 
@@ -39,7 +64,6 @@ function PDFUploaderSection(props) {
     if (file && file.type === "application/pdf") {
       // Check if it's a PDF
       pdfFileRef.current = file; // Store the file in useRef
-      console.log("Selected PDF:", pdfFileRef.current); // You can log or do something with the file
       event.target.value = "";
     } else {
       alert("Please select a PDF file");
