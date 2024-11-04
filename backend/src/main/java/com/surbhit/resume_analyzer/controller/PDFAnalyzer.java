@@ -40,10 +40,11 @@ public class PDFAnalyzer {
     @Autowired
     CacheUtils cacheUtils;
 
+    @CrossOrigin(origins = "http://localhost:5173")
     @PostMapping("/upload")
     public CompletableFuture<ResponseEntity<ResponseJson>> getAnalysis(
-            @RequestParam("file") MultipartFile file,       // PDF file sent as a request param
-            @RequestParam("metadata") String metadata                  // JSON metadata sent as a request body
+            @RequestPart("file") MultipartFile file,       // PDF file sent as a request param
+            @RequestPart("metadata") String metadata                  // JSON metadata sent as a request body
             , HttpSession httpSession) {
         LOGGER.info("Inside getAnalysis api ::");
         try {
@@ -57,7 +58,7 @@ public class PDFAnalyzer {
 //            Extract Metadata
             PDFUploadRequest pdfUploadRequest = objectMapper.readValue(metadata, PDFUploadRequest.class);
 //            Storing org in session
-            httpSession.setAttribute("organisation", pdfUploadRequest.getOrg());
+            httpSession.setAttribute("pdfUploadRequest", pdfUploadRequest);
 //            Service
             var serviceResponse = iAnalysisService.getAnalysisForResumeService(pdfString, pdfUploadRequest);
 
