@@ -4,13 +4,26 @@ import PDFUploaderSection from "./components/PDFUploaderSection";
 import Footer from "./components/Footer";
 import { useState } from "react";
 import Loading from "./components/Loading";
+import Response from "./components/Response";
 function App() {
-  const [loading,setLoading] = useState(false);
+  const [loading, setLoading] = useState(false);
+  const [response, setResponse] = useState("hello");
+  const [showPdf, setShowPdf] = useState(true);
   return (
     <>
-    {loading && <Loading />}
+      {loading && <Loading />}
       <Header />
-      <PDFUploaderSection setLoading = {setLoading}/>
+      {showPdf && (
+        <PDFUploaderSection
+          setLoading={setLoading}
+          setResponse={setResponse}
+          setShowPdf={setShowPdf}
+        />
+      )}
+      {!showPdf && <Response 
+        response = {response}
+        setShowPdf = {setShowPdf}
+      />}
       <Footer />
     </>
   );
