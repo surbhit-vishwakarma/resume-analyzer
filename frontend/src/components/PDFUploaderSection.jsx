@@ -2,7 +2,7 @@ import { useRef, useState } from "react";
 import axios from "axios";
 import Form from "./Form";
 function PDFUploaderSection(props) {
-  const { setLoading } = props;
+  const { setLoading, setResponse, setShowPdf } = props;
   const fileInputRef = useRef(null); // Use ref to access the file input element
   const pdfFileRef = useRef(null); // Use ref to store the selected PDF file
 
@@ -51,10 +51,15 @@ function PDFUploaderSection(props) {
           },
         }
       );
-      console.log("Response:", response.data);
+      console.log("Response:", response.data.body);
+      setResponse(response.data.body);
+    
     } catch (error) {
       console.error("Error uploading data:", error);
+      setResponse("Error while analysing");
     } finally {
+      
+      setShowPdf(false);
       setLoading(false);
     }
   };
